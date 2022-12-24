@@ -10,11 +10,10 @@ Welcome to polling-station's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+The polling-station is a library to make error handling easier. while improving code
+quality, and reliability.
 
+Index
+=====
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+* :ref:`Func Timeout`
