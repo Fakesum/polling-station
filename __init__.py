@@ -5,7 +5,7 @@ import typing as __typing
 
 T = __typing.TypeVar("T")
 
-def __timeit(f: __typing.Callable[[__typing.Any], T]) -> tuple(T, float):
+def __timeit(f: __typing.Callable[[__typing.Any], T]) -> tuple[T, float]:
     """Time the execution of a function and return the result of the
     function and the time taken.
 
