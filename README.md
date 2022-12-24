@@ -1,5 +1,6 @@
-# Fast and Featured Polling Library
-Consise and effiecient errror Handling made easy
+# Polling Station
+A library to help with creating more concise and reliable code
+with minimal effort.
 
 ## Installation
 
