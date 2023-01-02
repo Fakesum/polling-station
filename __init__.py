@@ -36,6 +36,10 @@ def __xor(*orands) -> bool:
     """
     return sum(bool(x) for x in orands) == 1
 
+# A internal None of sorts to diffrentiat the result: None
+# and the <no-result given state>
+class __NoValSet: pass
+
 # A Stoppable thread with a return val
 class ThreadWithReturn(__threading.Thread):
     def __init__(self, target) -> None:
@@ -43,10 +47,10 @@ class ThreadWithReturn(__threading.Thread):
         # daemon just in case
         self.daemon: bool = True
 
-        # need to use globals()["..."] since it thinks
-        # ... means _ThreadWithReturn... due to private
+        # need to use globals()["__NoValSet"] since it thinks
+        # __NoValSet means _ThreadWithReturn__NoValSet due to private
         # variables
-        self.target, self.result = target, globals()["..."]
+        self.target, self.result = target, globals()["__NoValSet"]
         self.e = None
 
     def run(self) -> None:
@@ -61,7 +65,7 @@ class ThreadWithReturn(__threading.Thread):
 
     def is_finished(self) -> None:
         # Check if result is defiend
-        return self.result != globals()["..."]
+        return self.result != globals()["__NoValSet"]
 
     def raise_exception(self) -> None:
         # A very crude way to stop a thread form the outside
@@ -90,7 +94,7 @@ def func_timeout(timeout: int | float, func: __typing.Callable, poll_time: float
     waiter_inst.start()
     
     for _ in range(round(timeout//poll_time)):
-        if waiter_inst.result != ...:
+        if waiter_inst.result != __NoValSet:
             if waiter_inst.e != None:
                 raise waiter_inst.e
             return waiter_inst.result
@@ -102,8 +106,8 @@ def func_timeout(timeout: int | float, func: __typing.Callable, poll_time: float
 def poll(
         timeout: int | float | None, 
         func: __typing.Callable,
-        expected_outcome: __typing.Type | __typing.Any=...,
-        validity_determiner: __typing.Type | __typing.Callable = ...,
+        expected_outcome: __typing.Type | __typing.Any=__NoValSet,
+        validity_determiner: __typing.Type | __typing.Callable = __NoValSet,
         per_func_poll_time: int | float = 0.5,
         return_val: bool=False,
         per_func_timeout: int | float | None = None,
@@ -113,7 +117,7 @@ def poll(
         true_timing: bool=False,
         fast: bool = False,
         generator: bool = False,
-        on_failer: __typing.Callable | __typing.Type = ...
+        on_failer: __typing.Callable | __typing.Type = __NoValSet
     ) -> bool | __typing.Any:
     """This function does too many things to explain, Just understand that this is
         By far the best method of adding reliability and speed to the code. specially
@@ -123,7 +127,7 @@ def poll(
     Args:
         timeout (int | float | None): The Timeout of the function
         func (__typing.Callable): The function that is to be repeated
-        expected_outcome (__typing.Type | __typing.Any, optional): the expected outcome if there is one. Defaults to ....
+        expected_outcome (__typing.Type | __typing.Any, optional): the expected outcome if there is one. Defaults to __NoValSet.
 
         validity_determiner(__typing.Type | __typing.Callable, optional): funciton, if specified the output of the given function will be run 
         throw the validity function specified in order to verify that the result was valid. The validity function must return either True or False 
@@ -149,7 +153,7 @@ def poll(
         generator (bool, optional): if the passed function yields then it might be a good idea to pass this argument as True
                                     since it pre-gens the function and checks for Exceptions before returning the returned val
                                     Defaults to False.
-        on_failer (__typing.Callbale): If defined, it runs when the function incounters a problem. Defaults to (lambda: ...)
+        on_failer (__typing.Callbale): If defined, it runs when the function incounters a problem. Defaults to (lambda: __NoValSet)
 
     Raises:
         SyntaxError: Timout Must be higher than poll
@@ -167,7 +171,7 @@ def poll(
         if (poll != None) and (timeout != None) and (timeout < poll): raise SyntaxError("Timout Must be higher than poll")
 
         # Check that only one of the expected_outcome or return_val is provided
-        if not (__xor((expected_outcome != ...), return_val, (validity_determiner != ...))): raise SyntaxError("Only Provide ONLY one return_val or expected_outcome or validity_determiner")
+        if not (__xor((expected_outcome != __NoValSet), return_val, (validity_determiner != __NoValSet))): raise SyntaxError("Only Provide ONLY one return_val or expected_outcome or validity_determiner")
         
         # The True timing and pre_func_timeout cannot be given at once
         if (true_timing and (timeout == None)): raise SyntaxError("The Timeout cannot be None when true_timing is specified")
@@ -191,10 +195,10 @@ def poll(
             if generator:
                 res = [i for i in res]
 
-            if (((res != expected_outcome)) if (validity_determiner == ...) else (validity_determiner(res) != True)) if (not return_val) else False:
+            if (((res != expected_outcome)) if (validity_determiner == __NoValSet) else (validity_determiner(res) != True)) if (not return_val) else False:
                 raise RuntimeError("Unexpected OutCome")
             else:
-                return (res if (return_val or validity_determiner != ...) else True)
+                return (res if (return_val or validity_determiner != __NoValSet) else True)
             
         except Exception as e:
             if error_logging:
