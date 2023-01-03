@@ -11,4 +11,4 @@ git clone https://github.com/Fakesum/ffp.git
 
 ## Usage
 
-Full Docs: `Docs In Progress`
+Full Docs: https://polling-station.readthedocs.io/en/latest/
