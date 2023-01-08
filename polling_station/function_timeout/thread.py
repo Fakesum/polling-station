@@ -5,13 +5,14 @@ class EscapableAndReturningThread(Thread):
     
     class NoValSet: pass
 
-    def __init__(self, target) -> None:
+    def __init__(self, target, args = [], kwargs = {}) -> None:
         super().__init__()
         # daemon just in case
         self.daemon: bool = True
 
         # target and result to be given
         self.target, self.result = target, self.NoValSet
+        self.args, self.kwargs = args, kwargs
         self.e = None
 
     def run(self) -> None:
@@ -19,7 +20,7 @@ class EscapableAndReturningThread(Thread):
         # is accessable for both main thread
         # And Running thread
         try:
-            self.result: typing.Any = self.target()
+            self.result: typing.Any = self.target(*self.args, *self.kwargs)
         except Exception as e:
             self.result = None
             self.e = e

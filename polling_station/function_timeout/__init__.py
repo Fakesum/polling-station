@@ -9,11 +9,13 @@ class FunctionTimeout: pass
 def func_timeout(
         function: typing.Callable[..., T],
         timeout: int | float,
+        args: list = [],
+        kwargs: dict = {},
         step: int | float | None = 0.5,
         stepbefore: bool = True
     ) -> T:
 
-    thread = EscapableAndReturningThread(function)
+    thread = EscapableAndReturningThread(function, args, kwargs)
     thread.start()
 
     timer = time.time()
